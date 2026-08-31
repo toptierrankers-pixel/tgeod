@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade Growth Co. — Daily Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14171c;
+    --panel: #1c2027;
+    --panel-2: #22262e;
+    --line: #2c313a;
+    --orange: #ff6b1a;
+    --orange-dim: #c9550f;
+    --steel: #5a8fb8;
+    --text: #eceef1;
+    --muted: #8b93a1;
+    --green: #48b878;
+    --red: #e0574a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      linear-gradient(180deg, rgba(255,107,26,0.05), transparent 220px);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 64px;
+  }
+
+  .sheet {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  header {
+    margin-bottom: 24px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .brand .mark {
+    width: 10px;
+    height: 10px;
+    background: var(--orange);
+    flex-shrink: 0;
+    transform: translateY(-2px);
+  }
+
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 0.2px;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .sub {
+    margin: 6px 0 0 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  #date-line {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .panel-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.4px;
+    margin: 0 0 16px 0;
+  }
+
+  .metric-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .metric-row:last-child { border-bottom: none; }
+
+  .metric-label {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .metric-label .hint {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .stepper button {
+    width: 34px;
+    height: 34px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.12s, color 0.12s;
+  }
+
+  .stepper button:hover { background: rgba(255,107,26,0.12); color: var(--orange); }
+  .stepper button:active { background: rgba(255,107,26,0.22); }
+
+  .stepper input {
+    width: 44px;
+    height: 34px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    -moz-appearance: textfield;
+  }
+
+  .stepper input::-webkit-outer-spin-button,
+  .stepper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .stepper input:focus { outline: none; background: rgba(255,107,26,0.08); }
+
+  #row-churned .metric-label { color: var(--text); }
+  #row-churned .stepper input { color: var(--red); }
+  #row-won .stepper input { color: var(--green); }
+
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px;
+    resize: vertical;
+  }
+
+  textarea:focus { outline: none; border-color: var(--orange-dim); }
+  textarea::placeholder { color: var(--muted); }
+
+  .checklist label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checklist input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    border-radius: 3px;
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.12s, background 0.12s;
+  }
+
+  .checklist input[type="checkbox"]:checked {
+    background: var(--orange);
+    border-color: var(--orange);
+  }
+
+  .checklist input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid #14171c;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .checklist .add-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .checklist .add-row input[type="text"] {
+    flex: 1;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 8px 10px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .checklist .add-row input[type="text"]:focus { outline: none; border-color: var(--orange-dim); }
+
+  .checklist .add-row button {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 0 14px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .checklist .add-row button:hover { color: var(--orange); border-color: var(--orange-dim); }
+
+  .checklist .remove {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .checklist .remove:hover { color: var(--red); }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  #copy-btn {
+    flex: 1;
+    background: var(--orange);
+    color: #17140f;
+    border: none;
+    border-radius: 4px;
+    padding: 15px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  #copy-btn:hover { background: #ff7c30; }
+  #copy-btn:active { background: var(--orange-dim); }
+
+  #reset-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 15px 16px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  #reset-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  #status {
+    text-align: center;
+    font-size: 13px;
+    color: var(--green);
+    height: 18px;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  #status.show { opacity: 1; }
+
+  .preview {
+    margin-top: 16px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: var(--muted);
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <div class="brand">
+      <span class="mark"></span>
+      <h1>Trade Growth Co.</h1>
+    </div>
+    <p class="sub">Daily rep report — <span id="date-line"></span></p>
+  </header>
+
+  <div class="panel">
+    <p class="panel-title">Today's numbers</p>
+
+    <div class="metric-row" id="row-won">
+      <div class="metric-label">Closes won</div>
+      <div class="stepper" data-field="closesWon">
+        <button type="button" data-delta="-1">−</button>
+        <input type="number" min="0" value="0" inputmode="numeric">
+        <button type="button" data-delta="1">+</button>
+      </div>
+    </div>
+
+    <div class="metric-row" id="row-followups">
+      <div class="metric-label">Follow-ups booked</div>
+      <div class="stepper" data-field="followUps">
+        <button type="button" data-delta="-1">−</button>
+        <input type="number" min="0" value="0" inputmode="numeric">
+        <button type="button" data-delta="1">+</button>
+      </div>
+    </div>
+
+    <div class="metric-row" id="row-cscalls">
+      <div class="metric-label">CS calls made</div>
+      <div class="stepper" data-field="csCalls">
+        <button type="button" data-delta="-1">−</button>
+        <input type="number" min="0" value="0" inputmode="numeric">
+        <button type="button" data-delta="1">+</button>
+      </div>
+    </div>
+
+    <div class="metric-row" id="row-churned">
+      <div class="metric-label">Churned</div>
+      <div class="stepper" data-field="churned">
+        <button type="button" data-delta="-1">−</button>
+        <input type="number" min="0" value="0" inputmode="numeric">
+        <button type="button" data-delta="1">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-title">Checklist</p>
+    <div class="checklist" id="checklist">
+      <!-- items injected by JS -->
+      <div class="add-row">
+        <input type="text" id="new-item-input" placeholder="Add a checklist item...">
+        <button type="button" id="add-item-btn">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel-title">Notes</p>
+    <textarea id="notes" placeholder="Anything worth flagging today — blockers, wins, context for tomorrow..."></textarea>
+  </div>
+
+  <div class="actions">
+    <button id="copy-btn" type="button">Copy report</button>
+    <button id="reset-btn" type="button">New day</button>
+  </div>
+  <div id="status"></div>
+
+  <div class="preview" id="preview"></div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'tgc-daily-report';
+
+  const fields = ['closesWon', 'followUps', 'csCalls', 'churned'];
+  const fieldLabels = {
+    closesWon: 'Closes won',
+    followUps: 'Follow-ups booked',
+    csCalls: 'CS calls made',
+    churned: 'Churned'
+  };
+
+  const defaultChecklist = [
+    { text: 'CRM updated', checked: false },
+    { text: 'Pipeline reviewed', checked: false },
+    { text: 'Manager / team updated', checked: false }
+  ];
+
+  function todayKey() {
+    return new Date().toDateString();
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (data.day !== todayKey()) return null; // stale from a previous day
+      return data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveState() {
+    const state = { day: todayKey(), values: {}, notes: notesEl.value, checklist: getChecklistData() };
+    fields.forEach(f => state.values[f] = getStepperValue(f));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    renderPreview();
+  }
+
+  function getStepperValue(field) {
+    const input = document.querySelector(`.stepper[data-field="${field}"] input`);
+    return parseInt(input.value, 10) || 0;
+  }
+
+  function setStepperValue(field, value) {
+    const input = document.querySelector(`.stepper[data-field="${field}"] input`);
+    input.value = Math.max(0, value);
+  }
+
+  function getChecklistData() {
+    return Array.from(document.querySelectorAll('#checklist .item')).map(row => ({
+      text: row.querySelector('.item-text').textContent,
+      checked: row.querySelector('input[type="checkbox"]').checked
+    }));
+  }
+
+  function renderChecklist(items) {
+    const container = document.getElementById('checklist');
+    const addRow = container.querySelector('.add-row');
+    container.querySelectorAll('.item').forEach(el => el.remove());
+
+    items.forEach((item) => {
+      const label = document.createElement('label');
+      label.className = 'item';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!item.checked;
+      cb.addEventListener('change', saveState);
+
+      const span = document.createElement('span');
+      span.className = 'item-text';
+      span.style.flex = '1';
+      span.textContent = item.text;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'remove';
+      removeBtn.textContent = '✕';
+      removeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        label.remove();
+        saveState();
+      });
+
+      label.appendChild(cb);
+      label.appendChild(span);
+      label.appendChild(removeBtn);
+      container.insertBefore(label, addRow);
+    });
+  }
+
+  const notesEl = document.getElementById('notes');
+  const statusEl = document.getElementById('status');
+  const previewEl = document.getElementById('preview');
+
+  document.querySelectorAll('.stepper').forEach(stepper => {
+    const input = stepper.querySelector('input');
+    stepper.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const delta = parseInt(btn.dataset.delta, 10);
+        input.value = Math.max(0, (parseInt(input.value, 10) || 0) + delta);
+        saveState();
+      });
+    });
+    input.addEventListener('input', () => {
+      if (input.value < 0) input.value = 0;
+      saveState();
+    });
+  });
+
+  notesEl.addEventListener('input', saveState);
+
+  document.getElementById('add-item-btn').addEventListener('click', addItem);
+  document.getElementById('new-item-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addItem(); }
+  });
+
+  function addItem() {
+    const input = document.getElementById('new-item-input');
+    const text = input.value.trim();
+    if (!text) return;
+    const items = getChecklistData();
+    items.push({ text, checked: false });
+    renderChecklist(items);
+    input.value = '';
+    saveState();
+  }
+
+  function formatDate() {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function buildReport() {
+    const lines = [];
+    lines.push(`Trade Growth Co. — Daily Report — ${formatDate()}`);
+    lines.push('');
+    fields.forEach(f => lines.push(`${fieldLabels[f]}: ${getStepperValue(f)}`));
+
+    const checklist = getChecklistData();
+    if (checklist.length) {
+      lines.push('');
+      lines.push('Checklist:');
+      checklist.forEach(item => lines.push(`[${item.checked ? 'x' : ' '}] ${item.text}`));
+    }
+
+    const notes = notesEl.value.trim();
+    lines.push('');
+    lines.push('Notes:');
+    lines.push(notes || '—');
+
+    return lines.join('\n');
+  }
+
+  function renderPreview() {
+    previewEl.textContent = buildReport();
+  }
+
+  document.getElementById('copy-btn').addEventListener('click', async () => {
+    const report = buildReport();
+    try {
+      await navigator.clipboard.writeText(report);
+      showStatus('Copied to clipboard.');
+    } catch (e) {
+      // fallback for older browsers / non-secure contexts
+      const ta = document.createElement('textarea');
+      ta.value = report;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showStatus('Copied to clipboard.');
+    }
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    if (!confirm('Clear all fields and start a fresh day?')) return;
+    fields.forEach(f => setStepperValue(f, 0));
+    notesEl.value = '';
+    renderChecklist(defaultChecklist.map(i => ({ ...i, checked: false })));
+    saveState();
+    showStatus('Cleared for a new day.');
+  });
+
+  let statusTimer;
+  function showStatus(msg) {
+    clearTimeout(statusTimer);
+    statusEl.textContent = msg;
+    statusEl.classList.add('show');
+    statusTimer = setTimeout(() => statusEl.classList.remove('show'), 2200);
+  }
+
+  function init() {
+    document.getElementById('date-line').textContent = formatDate();
+    const saved = loadState();
+    if (saved) {
+      fields.forEach(f => setStepperValue(f, saved.values[f] || 0));
+      notesEl.value = saved.notes || '';
+      renderChecklist(saved.checklist && saved.checklist.length ? saved.checklist : defaultChecklist);
+    } else {
+      renderChecklist(defaultChecklist);
+    }
+    renderPreview();
+  }
+
+  init();
+</script>
+
+</body>
+</html>
